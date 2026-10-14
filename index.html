@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>%LOVE? — Yapay Zeka ile Crush & Uyum Analizi</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            dark: '#09090b',
+            cardDark: 'rgba(18, 18, 23, 0.75)',
+            neonPink: '#ff2a85',
+            neonPurple: '#9333ea',
+            neonCyan: '#06b6d4',
+            neonEmerald: '#10b981',
+            neonAmber: '#f59e0b',
+          },
+          animation: {
+            'float-slow': 'floatSlow 14s ease-in-out infinite',
+            'float-reverse': 'floatReverse 16s ease-in-out infinite',
+            'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+            'radar-sweep': 'radarSweep 2.4s linear infinite',
+            'shimmer': 'shimmer 2.5s infinite',
+          },
+          keyframes: {
+            floatSlow: {
+              '0%, 100%': { transform: 'translate(0px, 0px) scale(1)' },
+              '50%': { transform: 'translate(35px, -45px) scale(1.08)' },
+            },
+            floatReverse: {
+              '0%, 100%': { transform: 'translate(0px, 0px) scale(1)' },
+              '50%': { transform: 'translate(-40px, 35px) scale(0.94)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.45', transform: 'scale(1)' },
+              '50%': { opacity: '0.8', transform: 'scale(1.06)' },
+            },
+            radarSweep: {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' },
+            },
+            shimmer: {
+              '0%': { transform: 'translateX(-100%)' },
+              '100%': { transform: 'translateX(200%)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+
+    /* Grid Overlay Pattern */
+    .bg-grid-pattern {
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    }
+
+    /* Glass card utility */
+    .glass-card {
+      background: rgba(18, 18, 24, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    /* Gradient Text */
+    .text-gradient-primary {
+      background: linear-gradient(135deg, #ffffff 0%, #f472b6 45%, #ec4899 75%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Radar scan effect */
+    .radar-sweep-line {
+      background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, rgba(255, 42, 133, 0.1) 320deg, rgba(255, 42, 133, 0.8) 360deg);
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body class="bg-dark text-zinc-100 min-h-screen font-sans selection:bg-pink-500/30 selection:text-pink-300 relative overflow-x-hidden">
+
+  <!-- ==================== AMBIENT NEON GLOW ORBS ==================== -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <!-- Neon Pink Orb (Top-Left) -->
+    <div class="absolute -top-32 -left-32 w-[550px] h-[550px] bg-gradient-to-tr from-pink-600/25 via-rose-500/20 to-purple-600/10 rounded-full blur-[140px] animate-float-slow"></div>
+    
+    <!-- Neon Violet/Indigo Orb (Top-Right) -->
+    <div class="absolute top-10 -right-32 w-[600px] h-[600px] bg-gradient-to-bl from-purple-600/30 via-indigo-600/20 to-pink-500/10 rounded-full blur-[150px] animate-float-reverse"></div>
+    
+    <!-- Neon Cyan/Teal Orb (Bottom-Center) -->
+    <div class="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[700px] h-[450px] bg-gradient-to-t from-cyan-500/15 via-pink-500/10 to-transparent rounded-full blur-[160px] animate-pulse-glow"></div>
+
+    <!-- Grid lines overlay -->
+    <div class="absolute inset-0 bg-grid-pattern opacity-60"></div>
+  </div>
+
+  <!-- ==================== GLOBAL TOAST ==================== -->
+  <div id="toastNotification" class="fixed top-6 right-6 z-50 transform translate-y-[-150%] opacity-0 transition-all duration-300 ease-out flex items-center gap-3 px-5 py-3.5 rounded-2xl glass-card border-pink-500/30 shadow-2xl shadow-pink-500/20">
+    <div class="w-8 h-8 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-pink-400">
+      <i data-lucide="sparkles" class="w-4 h-4"></i>
+    </div>
+    <div class="text-sm font-semibold text-zinc-100" id="toastMessage">Bildirim mesajı</div>
+  </div>
+
+  <!-- ==================== MAIN WRAPPER ==================== -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+    
+    <!-- ==================== NAVBAR ==================== -->
+    <header class="w-full border-b border-white/[0.06] backdrop-blur-xl bg-zinc-950/40 sticky top-0 z-40 transition-all">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+        
+        <!-- Logo (%LOVE?) -->
+        <a href="#" onclick="resetToHero(); return false;" class="group flex items-center gap-3">
+          <div class="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-500/20 via-purple-500/15 to-zinc-900 border border-pink-500/30 group-hover:border-pink-500/60 shadow-lg shadow-pink-500/10 transition-all duration-300">
+            <span class="text-pink-400 font-black text-xl group-hover:scale-110 transition-all font-mono">%</span>
+            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-pink-500 rounded-full animate-ping"></span>
+            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-pink-500 rounded-full"></span>
+          </div>
+          <div>
+            <div class="text-2xl font-black tracking-tight flex items-center">
+              <span class="text-white">%LOVE</span>
+              <span class="bg-gradient-to-r from-pink-500 to-purple-400 bg-clip-text text-transparent">?</span>
+            </div>
+            <div class="text-[10px] text-zinc-400 font-mono tracking-wider uppercase -mt-0.5">Yapay Zeka Dedikodu Motoru</div>
+          </div>
+        </a>
+
+        <!-- Middle Live Status Pill -->
+        <div class="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs font-mono text-zinc-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Slang Engine v2.4 <span class="text-zinc-500">|</span> 42.819 Kurban Talandı</span>
+        </div>
+
+        <!-- Right Controls -->
+        <div class="flex items-center gap-3">
+          <!-- Audio Toggle -->
+          <button id="soundToggleBtn" onclick="toggleAudio()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] text-xs font-medium text-zinc-300 transition-all" title="Efekt Sesleri">
+            <i data-lucide="volume-2" id="soundIcon" class="w-4 h-4 text-pink-400"></i>
+            <span class="hidden sm:inline" id="soundText">Ses Açık</span>
+          </button>
+
+          <!-- Troll Badge -->
+          <a href="#heroSection" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-pink-500/15 via-purple-500/15 to-transparent border border-pink-500/30 hover:border-pink-500/60 text-xs font-semibold text-pink-300 transition-all shadow-sm">
+            <i data-lucide="flame" class="w-3.5 h-3.5 text-pink-400"></i>
+            <span>%100 Delulu Onaylı</span>
+          </a>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- ==================== BODY CONTENT CONTAINER ==================== -->
+    <main class="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 py-10">
+
+      <!-- ======================================================== -->
+      <!-- SECTION 1: HERO SECTION                                  -->
+      <!-- ======================================================== -->
+      <section id="heroSection" class="w-full max-w-4xl mx-auto flex flex-col items-center text-center transition-all duration-500">
+        
+        <!-- Tag Pill -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-500/[0.08] border border-pink-500/20 text-xs font-medium text-pink-300 mb-6 backdrop-blur-md shadow-lg shadow-pink-500/5 hover:scale-105 transition-transform cursor-default">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-400 animate-spin" style="animation-duration: 8s;"></i>
+          <span>Kuantum Seviye Crush & Röntgen Teknolojisi</span>
+          <span class="px-1.5 py-0.5 rounded-md bg-pink-500/20 text-[10px] font-bold text-pink-200">YENİ</span>
+        </div>
+
+        <!-- Main Title -->
+        <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6">
+          <span class="text-gradient-primary">Yapay Zeka ile</span><br>
+          <span class="relative">
+            Crush & Uyum Analizi
+            <svg class="absolute -bottom-2.5 left-0 w-full text-pink-500/40" height="10" viewBox="0 0 300 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 9C50 3 150 2 299 9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-base sm:text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+          Platonik acılara, 14 saat sonra gelen görüldülere ve burç uyumu yalanlarına son. 
+          Crush'ının Instagram kullanıcı adını gir; <span class="text-zinc-200 font-semibold">%LOVE? ajanlarımız stalklasın</span>, 
+          bütün red flag'leri ve friendzone riskini saniyeler içinde masaya yatırsın!
+        </p>
+
+        <!-- Main Glass Input Card -->
+        <div class="w-full max-w-xl mx-auto glass-card rounded-3xl p-4 sm:p-7 relative group">
+          
+          <!-- Subtle Glow on Card -->
+          <div class="absolute -inset-0.5 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-indigo-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-100 transition duration-700 pointer-events-none"></div>
+
+          <form id="radarForm" onsubmit="handleStartAnalysis(event)" class="relative z-10 flex flex-col gap-4">
+            
+            <!-- Instagram Input Field -->
+            <div class="relative flex items-center">
+              <div class="absolute left-4 flex items-center gap-1.5 pointer-events-none text-zinc-400">
+                <i data-lucide="instagram" class="w-5 h-5 text-pink-400"></i>
+                <span class="text-lg font-bold text-pink-500">@</span>
+              </div>
+              <input 
+                type="text" 
+                id="targetUsername" 
+                name="username"
+                required
+                autocomplete="off"
+                placeholder="crushunun_kullanici_adi" 
+                class="w-full bg-black/40 border border-white/10 rounded-2xl pl-16 pr-12 py-4 text-base sm:text-lg font-medium text-white placeholder-zinc-500 focus:outline-none focus:border-pink-500/70 focus:ring-4 focus:ring-pink-500/20 transition-all"
+                oninput="sanitizeInput(this)"
+              />
+              <button 
+                type="button" 
+                onclick="clearInput()" 
+                id="clearBtn"
+                class="absolute right-4 text-zinc-500 hover:text-zinc-300 hidden p-1 rounded-lg hover:bg-white/10 transition-all">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- Preset / Troll Suggestions Pills -->
+            <div class="flex flex-col gap-2 pt-1 text-left">
+              <div class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
+                <span>Hızlı Kurban Seçenekleri:</span>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="selectPreset('delulu_prenses')" class="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-pink-500/20 border border-white/[0.06] hover:border-pink-500/30 text-xs text-zinc-300 hover:text-pink-200 transition-all">
+                  💅 @delulu_prenses
+                </button>
+                <button type="button" onclick="selectPreset('gymbro_furkan')" class="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-purple-500/20 border border-white/[0.06] hover:border-purple-500/30 text-xs text-zinc-300 hover:text-purple-200 transition-all">
+                  💪 @gymbro_furkan
+                </button>
+                <button type="button" onclick="selectPreset('entel_feridun_official')" class="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-cyan-500/20 border border-white/[0.06] hover:border-cyan-500/30 text-xs text-zinc-300 hover:text-cyan-200 transition-all">
+                  ☕ @entel_feridun_official
+                </button>
+                <button type="button" onclick="selectPreset('story_izleyip_donmeyen')" class="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-rose-500/20 border border-white/[0.06] hover:border-rose-500/30 text-xs text-zinc-300 hover:text-rose-200 transition-all">
+                  👻 @story_izleyip_donmeyen
+                </button>
+                <button type="button" onclick="selectPreset('evlenilecek_altin_insan')" class="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-emerald-500/20 border border-white/[0.06] hover:border-emerald-500/30 text-xs text-zinc-300 hover:text-emerald-200 transition-all">
+                  💍 @evlenilecek_altin_insan
+                </button>
+              </div>
+            </div>
+
+            <!-- Submit CTA Button -->
+            <button 
+              type="submit" 
+              id="submitBtn"
+              class="relative overflow-hidden group/btn mt-2 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-base sm:text-lg shadow-xl shadow-pink-500/25 hover:shadow-pink-500/40 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3">
+              <span class="relative z-10 flex items-center gap-2">
+                <span>Ajanları Sal & Röntgeni Başlat</span>
+                <i data-lucide="flame" class="w-5 h-5 text-amber-200 group-hover/btn:scale-125 transition-transform"></i>
+              </span>
+              <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover/btn:animate-shimmer pointer-events-none"></span>
+            </button>
+
+          </form>
+
+          <!-- Social Proof / Security disclaimer -->
+          <div class="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-zinc-400">
+            <span class="flex items-center gap-1">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+              Stalk Gizliliği %100 Korunur
+            </span>
+            <span class="flex items-center gap-1">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
+              Delulu Garantili Analiz
+            </span>
+            <span class="hidden sm:flex items-center gap-1">
+              <i data-lucide="heart-crack" class="w-3.5 h-3.5 text-rose-400"></i>
+              Friendzone Sigortalı
+            </span>
+          </div>
+
+        </div>
+
+        <!-- Trust Stat Cards in Hero -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full max-w-xl mx-auto mt-8">
+          <div class="glass-card rounded-2xl p-3 text-center">
+            <div class="text-xl sm:text-2xl font-black text-pink-400 font-mono">1.2M+</div>
+            <div class="text-[11px] text-zinc-400">Taranan Story & Bio</div>
+          </div>
+          <div class="glass-card rounded-2xl p-3 text-center">
+            <div class="text-xl sm:text-2xl font-black text-purple-400 font-mono">%98.4</div>
+            <div class="text-[11px] text-zinc-400">Friendzone İsabeti</div>
+          </div>
+          <div class="glass-card rounded-2xl p-3 text-center col-span-2 sm:col-span-1">
+            <div class="text-xl sm:text-2xl font-black text-emerald-400 font-mono">0 TL</div>
+            <div class="text-[11px] text-zinc-400">Kurtarılan Gurur Bedeli</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 2: FAKE AI SIMULATION LOADING STATE              -->
+      <!-- ======================================================== -->
+      <section id="loadingSection" class="w-full max-w-2xl mx-auto hidden flex-col items-center transition-all duration-500 py-6">
+        
+        <div class="w-full glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden text-center">
+          
+          <div class="absolute -top-24 -right-24 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <!-- Radar Scanner Visual -->
+          <div class="relative w-44 h-44 mx-auto mb-8 flex items-center justify-center">
+            <div class="absolute inset-0 rounded-full border border-pink-500/20"></div>
+            <div class="absolute inset-4 rounded-full border border-purple-500/20"></div>
+            <div class="absolute inset-8 rounded-full border border-dashed border-zinc-700"></div>
+            <div class="absolute inset-14 rounded-full border border-pink-500/30"></div>
+            <div class="absolute inset-0 rounded-full radar-sweep-line animate-radar-sweep pointer-events-none"></div>
+
+            <div class="relative z-10 w-20 h-20 rounded-full bg-zinc-950 border-2 border-pink-500/80 shadow-lg shadow-pink-500/30 flex flex-col items-center justify-center overflow-hidden">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                @
+              </div>
+              <span id="scanningTargetName" class="text-[9px] font-mono font-bold text-pink-300 mt-1 max-w-[70px] truncate">
+                target
+              </span>
+            </div>
+
+            <div class="absolute top-6 right-8 w-2 h-2 rounded-full bg-pink-500 animate-ping"></div>
+            <div class="absolute bottom-8 left-6 w-2.5 h-2.5 rounded-full bg-purple-400 animate-ping" style="animation-delay: 1.2s;"></div>
+          </div>
+
+          <!-- Loading Header -->
+          <div class="mb-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 text-xs font-mono text-pink-400 mb-2">
+              <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span>
+              <span>%LOVE? GİZLİ STALK PROTOKOLÜ AKTİF</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Ajanlar Hedefi İnceliyor...
+            </h2>
+            <p class="text-xs sm:text-sm text-zinc-400 font-mono mt-1">
+              Hedef: <span id="loadingTargetHandle" class="text-pink-400 font-bold">@crush</span>
+            </p>
+          </div>
+
+          <!-- Main Progress Bar -->
+          <div class="w-full bg-zinc-950/80 border border-white/10 rounded-full h-3.5 mb-2 overflow-hidden p-0.5 shadow-inner">
+            <div id="simProgressBar" class="h-full rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 transition-all duration-300 w-[5%] shadow-lg shadow-pink-500/50"></div>
+          </div>
+          <div class="flex justify-between items-center text-xs font-mono text-zinc-400 mb-8 px-1">
+            <span>Stalk İlerlemesi</span>
+            <span id="simProgressPercent" class="font-bold text-pink-400 tabular-nums">%5</span>
+          </div>
+
+          <!-- 4 AGENT STEPS (Strictly in Turkish slang) -->
+          <div class="space-y-3.5 text-left mb-6">
+            
+            <!-- Step 1: Ajan Alfa -->
+            <div id="agentStep1" class="step-card flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] transition-all duration-300">
+              <div class="step-icon mt-0.5 flex-shrink-0 w-7 h-7 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-400">
+                <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-pink-400"></i>
+              </div>
+              <div class="flex-grow">
+                <div class="step-text text-sm font-semibold text-zinc-300">
+                  Ajan Alfa: Estetik ve vibe kontrolü yapılıyor...
+                </div>
+                <div class="text-[11px] text-zinc-500 font-mono mt-0.5">
+                  VSCO filtreleri, ayna selfieleri ve story estetiği taranıyor.
+                </div>
+              </div>
+              <div class="step-status text-xs font-mono text-zinc-500 font-bold">BEKLİYOR</div>
+            </div>
+
+            <!-- Step 2: Ajan Beta -->
+            <div id="agentStep2" class="step-card flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] transition-all duration-300 opacity-60">
+              <div class="step-icon mt-0.5 flex-shrink-0 w-7 h-7 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-500">
+                <i data-lucide="circle-dashed" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-grow">
+                <div class="step-text text-sm font-semibold text-zinc-400">
+                  Ajan Beta: Takipçi/Takip edilen ego oranı hesaplanıyor...
+                </div>
+                <div class="text-[11px] text-zinc-500 font-mono mt-0.5">
+                  12k takipçi / 140 takip ego anomalisi matematiksel modelleniyor.
+                </div>
+              </div>
+              <div class="step-status text-xs font-mono text-zinc-500 font-bold">SIRADA</div>
+            </div>
+
+            <!-- Step 3: Ajan Gamma -->
+            <div id="agentStep3" class="step-card flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] transition-all duration-300 opacity-60">
+              <div class="step-icon mt-0.5 flex-shrink-0 w-7 h-7 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-500">
+                <i data-lucide="circle-dashed" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-grow">
+                <div class="step-text text-sm font-semibold text-zinc-400">
+                  Ajan Gamma: Bio red flag'leri taranıyor...
+                </div>
+                <div class="text-[11px] text-zinc-500 font-mono mt-0.5">
+                  Burç sembolleri, 'Carpe Diem' ve 'Sadece iş DM' leri taranıyor.
+                </div>
+              </div>
+              <div class="step-status text-xs font-mono text-zinc-500 font-bold">SIRADA</div>
+            </div>
+
+            <!-- Step 4: Ajan Omega -->
+            <div id="agentStep4" class="step-card flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] transition-all duration-300 opacity-60">
+              <div class="step-icon mt-0.5 flex-shrink-0 w-7 h-7 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-500">
+                <i data-lucide="circle-dashed" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-grow">
+                <div class="step-text text-sm font-semibold text-zinc-400">
+                  Ajan Omega: Friendzone ihtimali dengeleniyor...
+                </div>
+                <div class="text-[11px] text-zinc-500 font-mono mt-0.5">
+                  'Aşkım sen kardeşim gibisin' kuantum dalga boyu kalibre ediliyor.
+                </div>
+              </div>
+              <div class="step-status text-xs font-mono text-zinc-500 font-bold">SIRADA</div>
+            </div>
+
+          </div>
+
+          <!-- Live Terminal Output -->
+          <div class="rounded-2xl bg-black/60 border border-white/10 p-3.5 text-left font-mono text-[11px] text-zinc-400 shadow-inner">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-zinc-800 text-[10px] text-zinc-500 uppercase tracking-widest">
+              <span class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                %LOVE? CANLI AJAN LOGLARI
+              </span>
+              <span>CONSOLE://STREAM</span>
+            </div>
+            <div id="terminalStream" class="h-16 overflow-hidden flex flex-col justify-end space-y-1 text-zinc-400">
+              <div class="text-zinc-500">> %LOVE? ajan ağı başlatıldı. Ağ protokolü hazır.</div>
+              <div class="text-pink-400">> Hedef profil verisi yakalandı: Doğrulanıyor...</div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 3: RESULTS SECTION                               -->
+      <!-- ======================================================== -->
+      <section id="resultsSection" class="w-full max-w-4xl mx-auto hidden flex-col items-center transition-all duration-500">
+        
+        <div class="w-full glass-card rounded-3xl p-6 sm:p-10 relative overflow-hidden">
+          
+          <div class="absolute -top-20 -left-20 w-72 h-72 bg-pink-500/15 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-20 -right-20 w-72 h-72 bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+          <!-- Top Meta Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/[0.08] relative z-10">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-600 to-indigo-600 p-0.5 shadow-lg shadow-pink-500/20">
+                <div class="w-full h-full bg-zinc-950 rounded-[14px] flex items-center justify-center font-bold text-white text-lg">
+                  @
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 id="resultTargetName" class="text-xl font-black text-white">@kullanici</h3>
+                  <span class="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 text-[10px] font-mono font-bold border border-pink-500/30">
+                    RÖNTGENLENDİ
+                  </span>
+                </div>
+                <div class="text-xs text-zinc-400 font-mono mt-0.5">Analiz Motoru: %LOVE? AI v2.4 (Derin Sezgi)</div>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex items-center gap-2">
+              <button onclick="shareResult()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-semibold text-zinc-200 transition-all hover:scale-105">
+                <i data-lucide="share-2" class="w-3.5 h-3.5 text-pink-400"></i>
+                <span>Paylaş / Story</span>
+              </button>
+              <button onclick="resetToHero()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-500/30 hover:to-purple-500/30 border border-pink-500/30 text-xs font-semibold text-pink-300 transition-all hover:scale-105">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                <span>Yeni Kurban</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Compatibility Gauge -->
+          <div class="py-8 text-center relative z-10 flex flex-col items-center">
+            
+            <div class="relative w-48 h-48 sm:w-56 sm:h-56 mb-5 flex items-center justify-center">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="66" stroke="rgba(255, 255, 255, 0.06)" stroke-width="12" fill="none" />
+                <circle id="scoreCircle" cx="80" cy="80" r="66" 
+                  stroke="url(#scoreGradient)" 
+                  stroke-width="12" 
+                  fill="none" 
+                  stroke-linecap="round"
+                  stroke-dasharray="414.69" 
+                  stroke-dashoffset="414.69"
+                  class="transition-all duration-1000 ease-out" 
+                />
+                <defs>
+                  <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ff2a85" />
+                    <stop offset="50%" stop-color="#a855f7" />
+                    <stop offset="100%" stop-color="#06b6d4" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              <!-- Central Score Value -->
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-zinc-400 font-bold mb-0.5">Uyum Skoru</span>
+                <div class="text-4xl sm:text-5xl font-black text-white font-mono tracking-tight tabular-nums flex items-baseline">
+                  <span id="scoreNumber">0</span><span class="text-2xl text-pink-500">%</span>
+                </div>
+                <span id="scoreTagline" class="text-[11px] font-medium text-pink-300 mt-1 px-2.5 py-0.5 rounded-full bg-pink-500/10 border border-pink-500/20">
+                  Hesaplanıyor...
+                </span>
+              </div>
+            </div>
+
+            <h2 id="resultHeading" class="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+              Kaderin Mührü Çözüldü
+            </h2>
+            <p id="resultSubheading" class="text-sm sm:text-base text-zinc-400 max-w-lg mx-auto font-medium">
+              Ajanlarımız tüm verileri derledi. İşte aranızdaki gerçek durum:
+            </p>
+
+            <!-- Dynamic Badges -->
+            <div id="resultBadges" class="flex flex-wrap items-center justify-center gap-2 mt-5"></div>
+
+          </div>
+
+          <!-- Grid: Red & Green Flags -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4 relative z-10">
+            
+            <!-- Red Flags -->
+            <div class="glass-card rounded-2xl p-5 sm:p-6 border-rose-500/20 bg-rose-950/[0.08] hover:border-rose-500/40 transition-all">
+              <div class="flex items-center gap-2.5 mb-4 text-rose-400">
+                <div class="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center">
+                  <i data-lucide="flag" class="w-4 h-4 text-rose-400 fill-rose-500/20"></i>
+                </div>
+                <div>
+                  <h4 class="text-base font-bold text-white tracking-tight">Kırmızı Bayraklar (Red Flags)</h4>
+                  <div class="text-[11px] font-mono text-rose-400/80">3 Kritik Tehlike Noktası</div>
+                </div>
+              </div>
+              <div id="redFlagsList" class="space-y-3"></div>
+            </div>
+
+            <!-- Green Flags -->
+            <div class="glass-card rounded-2xl p-5 sm:p-6 border-emerald-500/20 bg-emerald-950/[0.08] hover:border-emerald-500/40 transition-all">
+              <div class="flex items-center gap-2.5 mb-4 text-emerald-400">
+                <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 fill-emerald-500/20"></i>
+                </div>
+                <div>
+                  <h4 class="text-base font-bold text-white tracking-tight">Yeşil Bayraklar (Green Flags)</h4>
+                  <div class="text-[11px] font-mono text-emerald-400/80">2 Teselli & Umut Noktası</div>
+                </div>
+              </div>
+              <div id="greenFlagsList" class="space-y-3"></div>
+            </div>
+
+          </div>
+
+          <!-- Önerilen DM (AI Rizz) -->
+          <div class="mt-5 glass-card rounded-2xl p-5 sm:p-6 border-pink-500/30 bg-gradient-to-br from-pink-950/[0.15] via-purple-950/[0.10] to-transparent relative z-10 group/dm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-pink-400">
+                  <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-mono font-bold text-pink-400 uppercase tracking-wider">Ajanların Önerdiği İlk Kurşun</div>
+                  <h4 class="text-base font-bold text-white">Önerilen DM (Yapay Zeka Rizz)</h4>
+                </div>
+              </div>
+
+              <button onclick="regenerateDm()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-mono text-zinc-300 transition-all">
+                <i data-lucide="dices" class="w-3.5 h-3.5 text-pink-400"></i>
+                <span>Başka Rizz Dene</span>
+              </button>
+            </div>
+
+            <div class="relative rounded-2xl bg-black/60 border border-white/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div class="text-sm sm:text-base font-medium text-pink-100 italic pr-2 flex-grow" id="suggestedDmText">
+                "DM satırı yükleniyor..."
+              </div>
+              <button 
+                id="copyDmBtn"
+                onclick="copySuggestedDm()" 
+                class="flex-shrink-0 w-full sm:w-auto px-4 py-2.5 rounded-xl bg-pink-500 hover:bg-pink-400 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-pink-500/30 transition-all">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span id="copyDmLabel">DM'i Kopyala</span>
+              </button>
+            </div>
+            <div class="text-[11px] text-zinc-500 font-mono mt-2">
+              💡 Uyarı: Bu mesajı attıktan sonra engellenirsen %LOVE? sorumluluk kabul etmez!
+            </div>
+          </div>
+
+          <!-- Yapay Zeka Kararı -->
+          <div class="mt-5 glass-card rounded-2xl p-5 sm:p-6 border-indigo-500/30 bg-gradient-to-r from-indigo-950/[0.15] to-zinc-950/40 relative z-10">
+            <div class="flex items-center gap-2.5 mb-2.5">
+              <div class="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+                <i data-lucide="bot" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="text-xs font-mono font-bold text-indigo-400 uppercase tracking-wider">%LOVE? Ajan Heyeti Son Sözü</div>
+                <h4 class="text-base font-bold text-white">Yapay Zeka Kararı</h4>
+              </div>
+            </div>
+
+            <div id="aiVerdictText" class="text-sm sm:text-base text-zinc-300 font-normal leading-relaxed pl-1 border-l-2 border-indigo-500/60 my-2">
+              "Yapay zeka kararı hazırlanıyor..."
+            </div>
+          </div>
+
+          <!-- Bottom Action Bar -->
+          <div class="mt-8 pt-6 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+            <div class="text-xs text-zinc-500 font-mono text-center sm:text-left">
+              Analiz Kimliği: <span id="reportId" class="text-zinc-400">#LOVE-8921-TK</span> | Veriler mizah amaçlıdır.
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <button 
+                onclick="resetToHero()" 
+                class="w-full sm:w-auto px-6 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-zinc-200 font-bold text-sm flex items-center justify-center gap-2 transition-all">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Başka Bir Kurbanı Test Et</span>
+              </button>
+              <button 
+                onclick="shareResult()" 
+                class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-pink-500/25 transition-all">
+                <i data-lucide="instagram" class="w-4 h-4"></i>
+                <span>Story Paylaş</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ==================== SHARE / STORY MODAL ==================== -->
+    <div id="shareModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300">
+      <div class="w-full max-w-sm glass-card rounded-3xl p-6 relative border-pink-500/30 text-center shadow-2xl">
+        
+        <button onclick="closeShareModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/10">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="w-12 h-12 rounded-2xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-pink-400 mx-auto mb-3">
+          <i data-lucide="camera" class="w-6 h-6"></i>
+        </div>
+
+        <h3 class="text-lg font-bold text-white mb-1">Story Kartın Hazır! 📸</h3>
+        <p class="text-xs text-zinc-400 mb-4">Aşağıdaki raporu ekran görüntüsü alıp direkt Instagram Story'e atabilirsin.</p>
+
+        <!-- Story Preview Box -->
+        <div id="storyCardPreview" class="rounded-2xl p-5 bg-gradient-to-b from-zinc-950 via-zinc-900 to-black border border-pink-500/40 shadow-inner mb-4 text-left font-sans">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-3">
+            <span class="text-xs font-black tracking-wider text-pink-400 flex items-center gap-1">
+              <span class="font-mono">%</span>%LOVE?
+            </span>
+            <span class="text-[9px] font-mono text-zinc-400">RESMİ UYUM RAPORU</span>
+          </div>
+          <div class="text-xs text-zinc-400">Kurban:</div>
+          <div id="storyTarget" class="text-base font-extrabold text-white mb-2">@crush</div>
+          
+          <div class="p-3 rounded-xl bg-pink-500/10 border border-pink-500/20 text-center mb-3">
+            <div class="text-[10px] font-mono text-pink-300">UYUM ORANI</div>
+            <div id="storyScore" class="text-3xl font-black text-white font-mono">%42</div>
+            <div id="storyBadge" class="text-[10px] font-bold text-amber-300 mt-0.5">⚠️ Kritik Friendzone Tehlikesi</div>
+          </div>
+
+          <div class="text-[10px] text-zinc-300 font-mono line-clamp-2 italic mb-2" id="storyVerdictPreview">
+            "Yapay zeka kararı..."
+          </div>
+
+          <div class="text-[9px] text-zinc-500 text-center font-mono">
+            %LOVE? ile test edildi ⚡
+          </div>
+        </div>
+
+        <button onclick="copyShareLink()" class="w-full py-3 rounded-xl bg-pink-500 hover:bg-pink-400 text-white font-bold text-xs flex items-center justify-center gap-2 mb-2 shadow-lg shadow-pink-500/20 transition-all">
+          <i data-lucide="link" class="w-3.5 h-3.5"></i>
+          <span id="copyLinkText">Sonuç Bağlantısını Kopyala</span>
+        </button>
+
+        <button onclick="closeShareModal()" class="w-full py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-400 font-medium text-xs transition-all">
+          Kapat
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="w-full border-t border-white/[0.06] py-6 px-4 text-center text-xs text-zinc-500 font-mono relative z-10">
+      <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-zinc-300">%LOVE?</span>
+          <span>•</span>
+          <span class="text-zinc-400">Mizah ve Kuantum Trolling Amaçlıdır</span>
+        </div>
+        <div class="flex items-center gap-4 text-zinc-400">
+          <span class="hover:text-pink-400 cursor-pointer" onclick="showToast('Hiçbir veri sunucuda tutulmaz, stalking gizlidir 🛡️')">Gizlilik Politikası</span>
+          <span>•</span>
+          <span class="hover:text-pink-400 cursor-pointer" onclick="showToast('Delulu olmak anayasal bir haktır 💅')">Delulu Hakları</span>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    let audioCtx = null;
+    let isSoundMuted = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playBeep(freq = 440, type = 'sine', duration = 0.08, volume = 0.08) {
+      if (isSoundMuted) return;
+      try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playSuccessChime() {
+      if (isSoundMuted) return;
+      setTimeout(() => playBeep(523.25, 'triangle', 0.1, 0.1), 0);
+      setTimeout(() => playBeep(659.25, 'triangle', 0.1, 0.1), 80);
+      setTimeout(() => playBeep(783.99, 'triangle', 0.2, 0.12), 160);
+      setTimeout(() => playBeep(1046.50, 'triangle', 0.35, 0.15), 240);
+    }
+
+    function toggleAudio() {
+      isSoundMuted = !isSoundMuted;
+      const soundIcon = document.getElementById('soundIcon');
+      const soundText = document.getElementById('soundText');
+      if (isSoundMuted) {
+        soundIcon.setAttribute('data-lucide', 'volume-x');
+        soundText.textContent = 'Sessiz';
+        showToast('Ses efektleri kapatıldı 🔕');
+      } else {
+        soundIcon.setAttribute('data-lucide', 'volume-2');
+        soundText.textContent = 'Ses Açık';
+        playBeep(600, 'sine', 0.1, 0.1);
+        showToast('Ses efektleri açıldı 🔔');
+      }
+      lucide.createIcons();
+    }
+
+    function sanitizeInput(input) {
+      input.value = input.value.replace(/@/g, '').trim().toLowerCase();
+      const clearBtn = document.getElementById('clearBtn');
+      if (input.value.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+    }
+
+    function clearInput() {
+      const input = document.getElementById('targetUsername');
+      input.value = '';
+      input.focus();
+      document.getElementById('clearBtn').classList.add('hidden');
+    }
+
+    function selectPreset(name) {
+      const input = document.getElementById('targetUsername');
+      input.value = name;
+      document.getElementById('clearBtn').classList.remove('hidden');
+      playBeep(500, 'sine', 0.05, 0.05);
+      showToast(`@${name} seçildi! 'Ajanları Sal' butonuna bas 🔥`);
+      const btn = document.getElementById('submitBtn');
+      btn.classList.add('ring-4', 'ring-pink-500/50');
+      setTimeout(() => btn.classList.remove('ring-4', 'ring-pink-500/50'), 400);
+    }
+
+    const trollDatabase = [
+      {
+        id: "toxic_gymbro",
+        keywords: ["gym", "fit", "furkan", "mert", "efe", "kas", "protein", "biceps", "bro"],
+        scoreRange: [11, 23],
+        badges: ["🚩 Yürüyen Toksik Barajı", "⚠️ Kritik Friendzone Tehlikesi", "💸 Ego Tavan, Rizz Sıfır"],
+        redFlags: [
+          "Biyografisinde 'No pain no gain 🔱 | PR: 190kg' yazıyor; senin doğum gününü unutur ama kreatin saatini asla şaşırmaz.",
+          "Takip ettiği 2.300 kişinin 2.290'ı taytlı fitness influencer'ı; DM kutusuna düşen mesajlar e-Devlet kapısından daha yoğun.",
+          "Story'lerine 4 saniyede bakar ama mesaja 18 saat sonra 'ya knka seti bozamadım kb' diye tek kelimelik ses kaydı atar."
+        ],
+        greenFlags: [
+          "Hesabında hiç eski sevgilisinin fotosu yok çünkü sadece aynadaki kendi trapez kaslarını seviyor, ex draması yaşamazsın.",
+          "Dışarıda yemek yerken hesabı protein tozuyla takas etmeye çalışmaz, tavuk-pilavcıda ucuza karnını doyurursun."
+        ],
+        dms: [
+          "Selam, ağırlık kaldırırken kalbimi de kaldırmayı denesene; 55 kiloyum ama sana karşı çekimim 200 kg basıyor.",
+          "Günde kaç gram protein alıyorsun bilmiyorum ama benim acil seninle bir kahve içme ihtiyacım var.",
+          "Set aralarında story izlemek yerine direkt bana yazsaydın şu an üçüncü buluşmayı planlıyorduk."
+        ],
+        verdict: "Bu çocukla flört edersen antidepresan masrafların kira masrafını geçer, arkadaşların da 'biz sana dedik' demekten yorulur. En fazla iki hafta konuşup 'vibe alamadım kankam' diye ghostlanırsın, yol yakınken bas engeli geç."
+      },
+      {
+        id: "delulu_prenses",
+        keywords: ["prenses", "su", "eda", "naz", "burc", "akrep", "ikizler", "tarot", "vibe", "delulu"],
+        scoreRange: [24, 38],
+        badges: ["💅 Delulu Seviyesi: Arşa Çıktı", "🔮 Merkür Retrosu Kurbanı", "⚠️ Kritik Friendzone Tehlikesi"],
+        redFlags: [
+          "Bio'sunda 'Güneş Koç, Yükselen Akrep, Ay Balık 🪐 Doğal Taş & Tarot' yazıyor; aranızdaki en ufak tartışmada 'Güneş patlaması vardı' deyip 3 gün konuşmaz.",
+          "Sana ilk mesajında 'Doğum haritanı atar mısın?' diyecek ve saatini tam bilmediğin için seni potansiyel narsist ilan edecek.",
+          "Öne çıkarılanlarında 84 tane adaçayı tütsüleme ve 'Evrene mesaj yolladım' story'si var; sana ilgi duyması için tütsü yakman gerekebilir."
+        ],
+        greenFlags: [
+          "Tarot falında seninle evleneceğini görürse dünyanın en sadık insanı olur, kahve falında bile senin baş harfini arar.",
+          "Playlist'inde gizli gizli 2000'ler Türkçe Pop döngüsü var, duygusal derinliği okyanus kadar geniş ve samimi."
+        ],
+        dms: [
+          "Doğum haritana baktırmadım ama hislerime göre aramızdaki çekim Plüton'u bile yörüngesinden çıkaracak cinsten, bir kahveye ne dersin?",
+          "Evrene yolladığın o pozitif mesaj bendim sanırım, naber?",
+          "Astroloğum bu hafta hayatımın hatasını yapmam gerektiğini söyledi, ben de direkt sana yazdım."
+        ],
+        verdict: "Bu kızla ilişkiye başlarsan haftalık burç yorumlarına göre azar işitir, pazar geceleri adaçayı dumanı içinde boğulursun. Yine de ruh ikizin olma ihtimali var ama delulu frekansına ayak uyduramazsan ilk haftadan elenirsin."
+      },
+      {
+        id: "entel_feridun",
+        keywords: ["feridun", "entel", "cem", "moda", "kadikoy", "sinema", "tarkovski", "analog", "plak"],
+        scoreRange: [28, 42],
+        badges: ["🚬 35mm Analog Hayat", "🎬 Fransız Yeni Dalgası Kurbanı", "🚩 Pasif Agresif Vibe"],
+        redFlags: [
+          "Bio'sunda sadece Tarkovski'den Fransızca bir alıntı ve siyah-beyaz kahve fincanı var; dinlediğin müzik popüler diye seni entelektüel olarak küçümser.",
+          "Sana WhatsApp yerine 'Ben ana akım mesajlaşma uygulamalarını tüketim çılgınlığı buluyorum' deyip Signal linki yollar.",
+          "Buluşmada 3 saat Godard ve varoluşsal sancılar anlatıp hesabı öderken cüzdanını unuttuğunu fark eder."
+        ],
+        greenFlags: [
+          "Seni Kadıköy ve Moda sokaklarında analog kamerasıyla çeker, Instagram'ına estetik fotoğraflar kazandırır.",
+          "Asla reels atıp boş yapmaz; sessiz sakin bir köşede plak dinletip çay ısmarlar."
+        ],
+        dms: [
+          "Tarkovski filmleri gibi gizemlisin ama ben senin en uzun planında bile gözümü kırpmadan kalabilirim, Moda'da bir filtre kahveye ne dersin?",
+          "Sende garip bir 90'lar Fransız sineması hüznü var, bir ara konuşalım mı?",
+          "Playlist'indeki gizli indie şarkıları tartışabileceğimiz tek kişi sensin gibi duruyor."
+        ],
+        verdict: "Bu kişi seni severse şiir yazar ama sen ikinci gün 'ben ne dinliyorum ya' deyip Serdar Ortaç açmak istersin. İki hafta içinde sana yabancılaşma teorisi anlatırken ghostlanırsın, kaç kendini kurtar."
+      },
+      {
+        id: "story_ghoster",
+        keywords: ["story", "ghost", "donmeyen", "ex", "kanka", "aleyna", "berk", "can"],
+        scoreRange: [14, 26],
+        badges: ["👻 3. Günde Ghostlanma Garantili", "⚠️ Kritik Friendzone Tehlikesi", "📱 Çevrimiçi Ama Yazmıyor"],
+        redFlags: [
+          "Attığın mesaja 8 saat sonra 'ay cnm bildirim gelmemiş yaa' der ama aynı 8 saatte 4 tane beReal ve 6 story paylaşmıştır.",
+          "Konuşmayı her zaman tek kelimelik 'Aynen', 'Hahah', 'Süper' gibi cevaplarla bitirme süper gücüne sahiptir.",
+          "Yakın arkadaşlar listesine seni 3 günlüğüne ekleyip merak uyandırır, sonra sessizce çıkartıp psikolojik harp uygular."
+        ],
+        greenFlags: [
+          "Mesajlaşmadığı için telefon şarjın iki gün gider, ekran süren azalır ve kariyerine odaklanırsın.",
+          "Yazdığı o nadir 3 dakikada sana dünyanın en tatlı insanıymış gibi hissettirip delulu dopamin patlaması yaşatır."
+        ],
+        dms: [
+          "Story'lerimi bu kadar hızlı izliyorsan olimpiyatlara katıl bence, madem buradasın iki kelam sohbet de ederiz belki?",
+          "Görüldü butonun bozulmuş gibi duruyor, teknik destek lazım mı?",
+          "Kaybolma hızın Houdini'yi kıskandırır ama yine de şansımı denemek istedim."
+        ],
+        verdict: "Bu insanla iletişim kurmaya çalışmak uzaya sinyal yollayıp 4 ışık yılı cevap beklemek gibidir. Sonuçta dönecektir ama döndüğünde sen emekli maaşı kuyruğunda olacaksın."
+      },
+      {
+        id: "altin_insan",
+        keywords: ["altin", "evlenilecek", "ask", "ruhum", "sevgi", "kusursuz", "melek", "dogru"],
+        scoreRange: [87, 96],
+        badges: ["🔔 Düğün Çanları", "💍 Nikah Memurunu Arayın", "💎 Kuantum Eşleşmesi"],
+        redFlags: [
+          "O kadar kusursuz ki kesinlikle bir yerinde yapay zeka veya MİT ajanı olma ihtimali var, insan şüphelenmeden duramıyor.",
+          "Gecenin bir yarısı komik kedi reels'ları atıp uykunu kaçırabilir ve gülme krizine sokabilir.",
+          "Annenle ilk günden daha iyi anlaşıp senin odanı sana karşı savunabilir."
+        ],
+        greenFlags: [
+          "Mesajlarına ortalama 45 saniyede döner, ne tripleri vardır ne de 'havalı görünmek için geç yazayım' kompleksleri.",
+          "Sen aç mısın diye sormadan kapına favori tatlını sipariş edecek kadar yüksek empati ve EQ sahibidir."
+        ],
+        dms: [
+          "Bugün yapay zeka bile seninle uyumumuza %94 verdi, yani evren bile arkamızda; bu akşam kahveler benden mi yoksa direkt nikah salonuna mı geçiyoruz?",
+          "Profili incelerken fark ettim de, sanki benim eksik parçam senin feed'inde unutulmuş gibi.",
+          "Normalde DM kutusu açılışlarında kötüyümdür ama sana yazmamak evrene saygısızlık olurdu."
+        ],
+        verdict: "Eğer bu kişiyi kaçırırsan hayatının en büyük fiyaskosunu yaşarsın, derhal takibe al ve ilk adımı at. Düğün çerezlerini hazırlayın, davetiyeler basılıyor!"
+      },
+      {
+        id: "friendzone_krali",
+        keywords: ["kanka", "dost", "oguz", "baris", "ahmet", "sinan", "batu", "emre"],
+        scoreRange: [42, 53],
+        badges: ["⚠️ Kritik Friendzone Tehlikesi", "🫂 'Sen Benim Kardeşimsin' Vakti", "🍺 Dert Ortağı Adayı"],
+        redFlags: [
+          "Sana 'kanka', 'bro', 'reis' veya 'kral' diye hitap etme riski %99.2; ilk haftadan kankalığa hapsolursun.",
+          "Sana başka flörtlerini anlatıp 'Sence ne yapmalıyım akıl ver' diyerek kalbini rendeler.",
+          "Birlikte dışarı çıktığınızda ortamdaki başkalarına bakıp 'Şu çocuk/kız nasıl sence?' diye fikir sorar."
+        ],
+        greenFlags: [
+          "Hayat boyu yanında olacak müthiş bir dert ortağı ve asla seni satmayacak güvenilir bir sırdaş kazanırsın.",
+          "Gece 3'te arasan 'Hayırdır ne oldu' deyip pijama terlikle yardıma koşacak kadar delikanlıdır."
+        ],
+        dms: [
+          "Bana 'kanka' demeyi bir günlüğüne bırakırsan, aslında ne kadar iyi bir sevgili adayı olduğumu gösterebilirim.",
+          "İçimden bir ses çok iyi arkadaş olabileceğimizi söylüyor ama ben o sese itiraz etmek için buradayım.",
+          "Birbirimize dert anlatmadan önce bir kahve içip flört etmeyi denesek nasıl olur?"
+        ],
+        verdict: "Burada aşk ararsan sadece kendine acı ve bol bol dert dinleme mesaisi satın alırsın. Dost kalıp bedava kahve içmek şu aşamada senin için en karlı yatırım."
+      }
+    ];
+
+    let currentProfile = null;
+    let currentScore = 0;
+    let currentTargetHandle = "";
+    let currentDmIndex = 0;
+
+    function showToast(message) {
+      const toast = document.getElementById('toastNotification');
+      const toastMsg = document.getElementById('toastMessage');
+      toastMsg.textContent = message;
+      toast.classList.remove('translate-y-[-150%]', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      
+      playBeep(800, 'sine', 0.04, 0.04);
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-150%]', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3200);
+    }
+
+    function getProfileForUsername(username) {
+      const lower = username.toLowerCase();
+      for (const item of trollDatabase) {
+        for (const kw of item.keywords) {
+          if (lower.includes(kw)) {
+            return item;
+          }
+        }
+      }
+      let hash = 0;
+      for (let i = 0; i < lower.length; i++) {
+        hash = ((hash << 5) - hash) + lower.charCodeAt(i);
+        hash |= 0;
+      }
+      return trollDatabase[Math.abs(hash) % trollDatabase.length];
+    }
+
+    function handleStartAnalysis(e) {
+      e.preventDefault();
+      const input = document.getElementById('targetUsername');
+      const username = input.value.trim().replace(/@/g, '');
+      
+      if (!username) {
+        showToast('Lütfen geçerli bir Instagram kullanıcı adı gir! 🧐');
+        input.focus();
+        return;
+      }
+
+      currentTargetHandle = username;
+      currentProfile = getProfileForUsername(username);
+
+      const [min, max] = currentProfile.scoreRange;
+      currentScore = Math.floor(Math.random() * (max - min + 1)) + min;
+
+      transitionToLoading();
+    }
+
+    function transitionToLoading() {
+      const hero = document.getElementById('heroSection');
+      const loading = document.getElementById('loadingSection');
+
+      hero.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => {
+        hero.classList.add('hidden');
+        hero.classList.remove('opacity-0', 'scale-95');
+
+        loading.classList.remove('hidden');
+        loading.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          loading.classList.remove('opacity-0', 'scale-95');
+          startFakeAiSimulation();
+        }, 50);
+      }, 300);
+
+      document.getElementById('loadingTargetHandle').textContent = `@${currentTargetHandle}`;
+      document.getElementById('scanningTargetName').textContent = `@${currentTargetHandle}`;
+    }
+
+    function startFakeAiSimulation() {
+      const progressBar = document.getElementById('simProgressBar');
+      const progressPercent = document.getElementById('simProgressPercent');
+      const terminal = document.getElementById('terminalStream');
+
+      for (let i = 1; i <= 4; i++) {
+        const stepEl = document.getElementById(`agentStep${i}`);
+        stepEl.classList.remove('border-pink-500/50', 'bg-pink-500/10', 'border-emerald-500/40', 'bg-emerald-500/10');
+        stepEl.classList.add('opacity-60');
+        stepEl.querySelector('.step-status').textContent = 'SIRADA';
+        stepEl.querySelector('.step-status').className = 'step-status text-xs font-mono text-zinc-500 font-bold';
+        stepEl.querySelector('.step-icon').innerHTML = '<i data-lucide="circle-dashed" class="w-4 h-4"></i>';
+      }
+      lucide.createIcons();
+
+      progressBar.style.width = '5%';
+      progressPercent.textContent = '%5';
+
+      function addTerminalLog(msg, colorClass = 'text-zinc-400') {
+        const line = document.createElement('div');
+        line.className = colorClass;
+        line.innerHTML = `> ${msg}`;
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+
+      // Step 1: Alfa
+      setTimeout(() => {
+        const step1 = document.getElementById('agentStep1');
+        step1.classList.remove('opacity-60');
+        step1.classList.add('border-pink-500/50', 'bg-pink-500/10');
+        step1.querySelector('.step-status').textContent = 'TARANIYOR';
+        step1.querySelector('.step-status').className = 'step-status text-xs font-mono text-pink-400 font-bold animate-pulse';
+        step1.querySelector('.step-icon').innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-pink-400"></i>';
+        lucide.createIcons();
+        playBeep(520, 'sine', 0.08, 0.06);
+        addTerminalLog("Ajan Alfa: Estetik ve vibe kontrolü yapılıyor...", "text-pink-300");
+        addTerminalLog("Son paylaşılan 12 postun renk paleti ve ışığı taranıyor...");
+      }, 200);
+
+      animateProgressBar(5, 28, 1200);
+
+      // Step 2: Beta
+      setTimeout(() => {
+        const step1 = document.getElementById('agentStep1');
+        step1.classList.remove('border-pink-500/50', 'bg-pink-500/10');
+        step1.classList.add('border-emerald-500/40', 'bg-emerald-500/10');
+        step1.querySelector('.step-status').textContent = 'TAMAMLANDI';
+        step1.querySelector('.step-status').className = 'step-status text-xs font-mono text-emerald-400 font-bold';
+        step1.querySelector('.step-icon').innerHTML = '<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>';
+
+        const step2 = document.getElementById('agentStep2');
+        step2.classList.remove('opacity-60');
+        step2.classList.add('border-pink-500/50', 'bg-pink-500/10');
+        step2.querySelector('.step-status').textContent = 'HESAPLANIYOR';
+        step2.querySelector('.step-status').className = 'step-status text-xs font-mono text-pink-400 font-bold animate-pulse';
+        step2.querySelector('.step-icon').innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-pink-400"></i>';
+        lucide.createIcons();
+        playBeep(640, 'sine', 0.08, 0.06);
+
+        addTerminalLog("Ajan Beta: Takipçi/Takip edilen ego oranı hesaplanıyor...", "text-purple-300");
+        addTerminalLog("Ego / Beğeni katsayısı: Kritik sınırda.");
+      }, 1400);
+
+      animateProgressBar(28, 54, 1400, 1400);
+
+      // Step 3: Gamma
+      setTimeout(() => {
+        const step2 = document.getElementById('agentStep2');
+        step2.classList.remove('border-pink-500/50', 'bg-pink-500/10');
+        step2.classList.add('border-emerald-500/40', 'bg-emerald-500/10');
+        step2.querySelector('.step-status').textContent = 'TAMAMLANDI';
+        step2.querySelector('.step-status').className = 'step-status text-xs font-mono text-emerald-400 font-bold';
+        step2.querySelector('.step-icon').innerHTML = '<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>';
+
+        const step3 = document.getElementById('agentStep3');
+        step3.classList.remove('opacity-60');
+        step3.classList.add('border-pink-500/50', 'bg-pink-500/10');
+        step3.querySelector('.step-status').textContent = 'TARANIYOR';
+        step3.querySelector('.step-status').className = 'step-status text-xs font-mono text-pink-400 font-bold animate-pulse';
+        step3.querySelector('.step-icon').innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-pink-400"></i>';
+        lucide.createIcons();
+        playBeep(760, 'sine', 0.08, 0.06);
+
+        addTerminalLog("Ajan Gamma: Bio red flag'leri taranıyor...", "text-amber-300");
+        addTerminalLog("UYARI: Bio'da 'Sadece iş' veya burç emojisi saptandı.");
+      }, 2800);
+
+      animateProgressBar(54, 82, 1400, 2800);
+
+      // Step 4: Omega
+      setTimeout(() => {
+        const step3 = document.getElementById('agentStep3');
+        step3.classList.remove('border-pink-500/50', 'bg-pink-500/10');
+        step3.classList.add('border-emerald-500/40', 'bg-emerald-500/10');
+        step3.querySelector('.step-status').textContent = 'TAMAMLANDI';
+        step3.querySelector('.step-status').className = 'step-status text-xs font-mono text-emerald-400 font-bold';
+        step3.querySelector('.step-icon').innerHTML = '<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>';
+
+        const step4 = document.getElementById('agentStep4');
+        step4.classList.remove('opacity-60');
+        step4.classList.add('border-pink-500/50', 'bg-pink-500/10');
+        step4.querySelector('.step-status').textContent = 'DENGELENİYOR';
+        step4.querySelector('.step-status').className = 'step-status text-xs font-mono text-pink-400 font-bold animate-pulse';
+        step4.querySelector('.step-icon').innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-pink-400"></i>';
+        lucide.createIcons();
+        playBeep(880, 'sine', 0.08, 0.07);
+
+        addTerminalLog("Ajan Omega: Friendzone ihtimali dengeleniyor...", "text-cyan-300");
+        addTerminalLog("Kuantum delulu matrisi ve flört frekansı birleştiriliyor.");
+      }, 4200);
+
+      animateProgressBar(82, 100, 1200, 4200);
+
+      setTimeout(() => {
+        const step4 = document.getElementById('agentStep4');
+        step4.classList.remove('border-pink-500/50', 'bg-pink-500/10');
+        step4.classList.add('border-emerald-500/40', 'bg-emerald-500/10');
+        step4.querySelector('.step-status').textContent = 'TAMAMLANDI';
+        step4.querySelector('.step-status').className = 'step-status text-xs font-mono text-emerald-400 font-bold';
+        step4.querySelector('.step-icon').innerHTML = '<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>';
+        lucide.createIcons();
+
+        playSuccessChime();
+        addTerminalLog("TÜM AJANLAR RAPORUNU SUNDU! Sonuçlar ekrana aktarılıyor...", "text-emerald-400 font-bold");
+
+        setTimeout(() => {
+          showResultsView();
+        }, 600);
+      }, 5500);
+    }
+
+    function animateProgressBar(from, to, duration, delay = 0) {
+      setTimeout(() => {
+        const progressBar = document.getElementById('simProgressBar');
+        const progressPercent = document.getElementById('simProgressPercent');
+        const startTime = performance.now();
+
+        function update(currentTime) {
+          const elapsed = currentTime - startTime;
+          const factor = Math.min(elapsed / duration, 1);
+          const current = Math.round(from + (to - from) * factor);
+          progressBar.style.width = `${current}%`;
+          progressPercent.textContent = `%${current}`;
+
+          if (factor < 1) {
+            requestAnimationFrame(update);
+          }
+        }
+        requestAnimationFrame(update);
+      }, delay);
+    }
+
+    function showResultsView() {
+      const loading = document.getElementById('loadingSection');
+      const results = document.getElementById('resultsSection');
+
+      loading.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => {
+        loading.classList.add('hidden');
+        results.classList.remove('hidden');
+        results.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          results.classList.remove('opacity-0', 'scale-95');
+          populateResultsData();
+        }, 50);
+      }, 300);
+    }
+
+    function populateResultsData() {
+      document.getElementById('resultTargetName').textContent = `@${currentTargetHandle}`;
+      document.getElementById('reportId').textContent = `#LOVE-${Math.floor(1000 + Math.random() * 9000)}-${currentTargetHandle.substring(0,3).toUpperCase()}`;
+
+      const scoreNumber = document.getElementById('scoreNumber');
+      const scoreCircle = document.getElementById('scoreCircle');
+      const totalCircumference = 414.69;
+      const targetOffset = totalCircumference - (totalCircumference * (currentScore / 100));
+
+      setTimeout(() => {
+        scoreCircle.style.strokeDashoffset = targetOffset;
+      }, 100);
+
+      let currentVal = 0;
+      const stepTime = Math.max(15, Math.floor(1200 / currentScore));
+      const counterTimer = setInterval(() => {
+        currentVal++;
+        scoreNumber.textContent = currentVal;
+        playBeep(200 + currentVal * 8, 'sine', 0.02, 0.02);
+        if (currentVal >= currentScore) {
+          clearInterval(counterTimer);
+          scoreNumber.textContent = currentScore;
+          finalizeScorePresentation();
+        }
+      }, stepTime);
+
+      const badgesContainer = document.getElementById('resultBadges');
+      badgesContainer.innerHTML = '';
+      currentProfile.badges.forEach((b) => {
+        const badgeSpan = document.createElement('span');
+        let colorClasses = "bg-rose-500/15 border-rose-500/30 text-rose-300";
+        if (b.includes("Düğün") || b.includes("Yeşil") || b.includes("Eşleşme")) {
+          colorClasses = "bg-emerald-500/15 border-emerald-500/30 text-emerald-300";
+        } else if (b.includes("Delulu") || b.includes("Friendzone")) {
+          colorClasses = "bg-amber-500/15 border-amber-500/30 text-amber-300";
+        } else if (b.includes("35mm")) {
+          colorClasses = "bg-purple-500/15 border-purple-500/30 text-purple-300";
+        }
+        badgeSpan.className = `px-3.5 py-1 rounded-full text-xs font-bold border ${colorClasses} shadow-sm animate-pulse-glow`;
+        badgeSpan.textContent = b;
+        badgesContainer.appendChild(badgeSpan);
+      });
+
+      // 3 Red Flags
+      const redList = document.getElementById('redFlagsList');
+      redList.innerHTML = '';
+      currentProfile.redFlags.forEach((flag, idx) => {
+        const item = document.createElement('div');
+        item.className = 'flex items-start gap-3 p-3 rounded-xl bg-black/40 border border-rose-500/20 text-xs sm:text-sm text-zinc-300 leading-relaxed';
+        item.innerHTML = `
+          <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-md bg-rose-500/20 flex items-center justify-center text-rose-400 font-mono text-[10px] font-bold">
+            ${idx + 1}
+          </div>
+          <div>${flag}</div>
+        `;
+        redList.appendChild(item);
+      });
+
+      // 2 Green Flags
+      const greenList = document.getElementById('greenFlagsList');
+      greenList.innerHTML = '';
+      currentProfile.greenFlags.forEach((flag, idx) => {
+        const item = document.createElement('div');
+        item.className = 'flex items-start gap-3 p-3 rounded-xl bg-black/40 border border-emerald-500/20 text-xs sm:text-sm text-zinc-300 leading-relaxed';
+        item.innerHTML = `
+          <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-md bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-mono text-[10px] font-bold">
+            ${idx + 1}
+          </div>
+          <div>${flag}</div>
+        `;
+        greenList.appendChild(item);
+      });
+
+      currentDmIndex = 0;
+      document.getElementById('suggestedDmText').textContent = `"${currentProfile.dms[currentDmIndex]}"`;
+      document.getElementById('aiVerdictText').textContent = currentProfile.verdict;
+
+      if (currentScore > 65) {
+        triggerConfetti();
+      }
+
+      lucide.createIcons();
+    }
+
+    function finalizeScorePresentation() {
+      const scoreTagline = document.getElementById('scoreTagline');
+      const resultHeading = document.getElementById('resultHeading');
+      const resultSubheading = document.getElementById('resultSubheading');
+
+      if (currentScore < 30) {
+        scoreTagline.textContent = "Toksik Çernobil Reaktörü ☣️";
+        scoreTagline.className = "text-[11px] font-bold text-rose-300 mt-1 px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/40";
+        resultHeading.textContent = "Kaç Kurtar Kendini, Arkana Bile Bakma!";
+        resultSubheading.textContent = "Ajanlarımız profilin her köşesinden buram buram red flag kokusu aldı. Bu stalk burada bitsin.";
+      } else if (currentScore <= 65) {
+        scoreTagline.textContent = "Araftasın: Friendzone Riski %90 ⚠️";
+        scoreTagline.className = "text-[11px] font-bold text-amber-300 mt-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40";
+        resultHeading.textContent = "Kanka Ayağı G** Ayağı Sınırı!";
+        resultSubheading.textContent = "Uyum var gibi duruyor ama bir yanlış cümlende ömür boyu dert ortağına dönüşebilirsin.";
+      } else {
+        scoreTagline.textContent = "Kader Ağlarını Ördü 💍";
+        scoreTagline.className = "text-[11px] font-bold text-emerald-300 mt-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40";
+        resultHeading.textContent = "Düğün Çerezlerini Hazırlayın!";
+        resultSubheading.textContent = "Evrende nadir görülen yeşil bayrak uyumu tespit edildi. İlk adımı atmayan kaybeder.";
+      }
+    }
+
+    function regenerateDm() {
+      if (!currentProfile) return;
+      currentDmIndex = (currentDmIndex + 1) % currentProfile.dms.length;
+      const dm = currentProfile.dms[currentDmIndex];
+      const dmEl = document.getElementById('suggestedDmText');
+      dmEl.style.opacity = '0';
+      playBeep(650, 'sine', 0.05, 0.05);
+      setTimeout(() => {
+        dmEl.textContent = `"${dm}"`;
+        dmEl.style.opacity = '1';
+      }, 150);
+      showToast('Yeni alternatif DM oluşturuldu! 🎲');
+    }
+
+    function copySuggestedDm() {
+      const dmText = document.getElementById('suggestedDmText').textContent.replace(/"/g, '');
+      navigator.clipboard.writeText(dmText).then(() => {
+        const btnLabel = document.getElementById('copyDmLabel');
+        btnLabel.textContent = 'Kopyalandı! 🔥 Şimdi Rezil Olma Vakti';
+        showToast('DM panoya kopyalandı! Şimdi Instagram\'a yapıştır 🔥');
+        playSuccessChime();
+        setTimeout(() => {
+          btnLabel.textContent = "DM'i Kopyala";
+        }, 2500);
+      }).catch(() => {
+        showToast('Kopyalama başarısız, manuel seçebilirsin.');
+      });
+    }
+
+    function shareResult() {
+      const modal = document.getElementById('shareModal');
+      document.getElementById('storyTarget').textContent = `@${currentTargetHandle}`;
+      document.getElementById('storyScore').textContent = `%${currentScore}`;
+      document.getElementById('storyBadge').textContent = currentProfile.badges[0];
+      document.getElementById('storyVerdictPreview').textContent = `"${currentProfile.verdict}"`;
+      
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+      playBeep(700, 'triangle', 0.08, 0.07);
+    }
+
+    function closeShareModal() {
+      const modal = document.getElementById('shareModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function copyShareLink() {
+      const shareText = `%LOVE?'da @${currentTargetHandle} ile uyumumu test ettim! Uyum: %${currentScore} 🔥 Sonuç: ${currentProfile.badges[0]}`;
+      navigator.clipboard.writeText(shareText).then(() => {
+        const btnText = document.getElementById('copyLinkText');
+        btnText.textContent = 'Bağlantı ve Özet Kopyalandı!';
+        showToast('Paylaşım metni panoya kopyalandı! Story\'de paylaş 📸');
+        setTimeout(() => {
+          btnText.textContent = 'Sonuç Bağlantısını Kopyala';
+        }, 2500);
+      });
+    }
+
+    function resetToHero() {
+      const hero = document.getElementById('heroSection');
+      const loading = document.getElementById('loadingSection');
+      const results = document.getElementById('resultsSection');
+
+      results.classList.add('opacity-0', 'scale-95');
+      loading.classList.add('opacity-0', 'scale-95');
+
+      setTimeout(() => {
+        results.classList.add('hidden');
+        loading.classList.add('hidden');
+        hero.classList.remove('hidden');
+        hero.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          hero.classList.remove('opacity-0', 'scale-95');
+          const input = document.getElementById('targetUsername');
+          input.value = '';
+          input.focus();
+          document.getElementById('clearBtn').classList.add('hidden');
+        }, 50);
+      }, 300);
+
+      closeShareModal();
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 75,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#ff2a85', '#a855f7', '#06b6d4', '#fbbf24', '#ffffff']
+        });
+      }
+    }
+
+    window.addEventListener('click', (e) => {
+      const modal = document.getElementById('shareModal');
+      if (e.target === modal) {
+        closeShareModal();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
